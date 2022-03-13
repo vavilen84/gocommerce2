@@ -5,7 +5,7 @@ import (
 	"api/env"
 	"context"
 	"database/sql"
-	"github.com/beego/beego/v2/adapter/orm"
+	"github.com/astaxie/beego/orm"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
 )
