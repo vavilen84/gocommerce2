@@ -47,18 +47,19 @@ func FindUserById(o orm.Ormer, id int64) (m User, err error) {
 	return
 }
 
-func InsertUser(o orm.Ormer, m User) (id int64, err error) {
+func InsertUser(o orm.Ormer, m *User) (err error) {
 	m.setPassword()
 	m.setTimestampsOnCreate()
 	isValid := m.validateOnInsert(o)
 	if !isValid {
 		return
 	}
-	id, err = o.Insert(m)
+	id, err := o.Insert(m)
 	if err != nil {
 		logs.Error(err)
 		return
 	}
+	m.Id = id
 	return
 }
 
