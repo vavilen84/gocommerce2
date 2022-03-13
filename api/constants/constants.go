@@ -30,6 +30,7 @@ const (
 	DockerMysqlServiceEnvVar = "DOCKER_MYSQL_SERVICE"
 
 	// app env
+	EnvFileVar   = "ENV_FILE"
 	AppEnvEnvVar = "APP_ENV"
 
 	DevelopmentAppEnv = "development"
