@@ -1,16 +1,16 @@
 package models
 
 const (
-	Product1Sku = "product_1_sku"
+	user1key = "user_1"
 )
 
 var (
-	usersFixtures map[int]User
+	usersFixtures map[string]User
 )
 
 func initFixtures() {
-	usersFixtures = map[int]User{
-		1: {
+	usersFixtures = map[string]User{
+		user1key: {
 			Email:     "user_1@example.com",
 			Password:  "123456",
 			Role:      UserRoleCustomer,

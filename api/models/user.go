@@ -48,9 +48,13 @@ func FindUserById(o orm.Ormer, id int64) (m User, err error) {
 }
 
 func InsertUser(o orm.Ormer, m *User) (err error) {
+	isValid := m.validatePassword()
+	if !isValid {
+		return
+	}
 	m.setPassword()
-	m.setTimestampsOnCreate()
-	isValid := m.validateOnInsert(o)
+	m.setTimestampsOnInsert()
+	isValid = m.validateOnInsert(o)
 	if !isValid {
 		return
 	}
@@ -90,7 +94,7 @@ func (m *User) setPasswordOnUpdate(o orm.Ormer) {
 	}
 }
 
-func (m *User) setTimestampsOnCreate() {
+func (m *User) setTimestampsOnInsert() {
 	now := int(time.Now().Unix())
 	m.CreatedAt = now
 	m.UpdatedAt = now
@@ -137,13 +141,23 @@ func (m *User) ValidateUserExists(o orm.Ormer, valid *validation.Validation) {
 	}
 }
 
+func (m *User) validatePassword() bool {
+	valid := validation.Validation{}
+	valid.Required(m.Password, "password")
+	valid.MaxSize(m.Password, 16, "password")
+	if valid.HasErrors() {
+		for _, err := range valid.Errors {
+			logs.Error(err)
+		}
+		return false
+	}
+	return true
+}
+
 func (m *User) validateCommonFields(valid *validation.Validation) {
 	valid.Required(m.Email, "email")
 	valid.MaxSize(m.Email, 255, "email")
 	valid.Email(m.Email, "email")
-
-	valid.Required(m.Password, "password")
-	valid.MaxSize(m.Password, 16, "password")
 
 	valid.Required(m.Salt, "salt")
 
@@ -155,6 +169,9 @@ func (m *User) validateCommonFields(valid *validation.Validation) {
 
 	valid.Required(m.LastName, "last_name")
 	valid.MaxSize(m.LastName, 255, "last_name")
+
+	valid.Required(m.CreatedAt, "created_at")
+	valid.Required(m.UpdatedAt, "updated_at")
 }
 
 func (m *User) validateOnUpdate(o orm.Ormer) bool {
@@ -178,7 +195,7 @@ func (m *User) validateOnInsert(o orm.Ormer) bool {
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
 		for _, err := range valid.Errors {
-			logs.Error(err)
+			logs.Error("Validation error; Model: %v; Key: %v; Message: %v", constants.UserModel, err.Key, err.Message)
 		}
 		return false
 	}
