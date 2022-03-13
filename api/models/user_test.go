@@ -7,7 +7,7 @@ import (
 )
 
 func createUser(t *testing.T, o orm.Ormer) *User {
-	u := usersFixtures[1]
+	u := usersFixtures[user1key]
 	err := InsertUser(o, &u)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, u.Id)

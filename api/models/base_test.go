@@ -30,6 +30,7 @@ func beforeEachTest() {
 		initConfig()
 		setTestAppEnv()
 		store.InitTestORM()
+		initFixtures()
 		testAppInited = true
 	}
 	restoreFromDump()
