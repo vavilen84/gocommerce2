@@ -19,11 +19,18 @@ func init() {
 
 // Run the migrations
 func (m *AddUserTable_20220312_182028) Up() {
-	m.SQL("CREATE TABLE user (" +
-		"id int NOT NULL PRIMARY KEY AUTO_INCREMENT, " +
-		"email varchar(255), " +
-		"password text, " +
-		"salt text);")
+	m.SQL("CREATE TABLE `user` (" +
+		"id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, " +
+		"email VARCHAR(255), " +
+		"password TEXT, " +
+		"salt TEXT," +
+		"first_name VARCHAR(255)," +
+		"last_name VARCHAR(255)," +
+		"role SMALLINT," +
+		"created_at INT(11)," +
+		"updated_at INT(11)," +
+		"deleted_at INT(11)" +
+		");")
 	m.SQL("ALTER TABLE user ADD UNIQUE INDEX email_idx(email);")
 }
 
