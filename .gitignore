@@ -3,3 +3,5 @@ api/api
 api/swagger
 api/conf/app.conf
 api/.env
+api/tmp/*
+!api/tmp/.gitignore
