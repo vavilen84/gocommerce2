@@ -37,6 +37,9 @@ const (
 	ProductionAppEnv  = "production"
 	TestingAppEnv     = "testing"
 
+	// makefile commands
+	RestoreTestDbDump = "restore-test-db-dump"
+
 	// db
 	DefaultDBAlias = "default"
 

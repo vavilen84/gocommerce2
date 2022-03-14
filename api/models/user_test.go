@@ -17,6 +17,20 @@ func createUser(t *testing.T, o orm.Ormer) *User {
 func TestInsertUser(t *testing.T) {
 	beforeEachTest()
 	o := orm.NewOrm()
+
+	// validation check
+	u := User{}
+	err := InsertUser(o, &u)
+	assert.Nil(t, err)
+	assert.Empty(t, u.Id)
+	assert.NotEmpty(t, u.ValidationErrors["email"])
+	assert.NotEmpty(t, u.ValidationErrors["password"])
+	assert.NotEmpty(t, u.ValidationErrors["salt"])
+	assert.NotEmpty(t, u.ValidationErrors["first_name"])
+	assert.NotEmpty(t, u.ValidationErrors["last_name"])
+	assert.NotEmpty(t, u.ValidationErrors["role"])
+
+	// successfully inserted
 	createUser(t, o)
 }
 

@@ -3,11 +3,12 @@ package models
 import (
 	"api/constants"
 	"api/env"
-	"api/helpers"
 	"api/store"
+	"database/sql"
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/joho/godotenv"
 	"os"
+	"os/exec"
 	"path"
 )
 
@@ -25,6 +26,28 @@ func initConfig() {
 	}
 }
 
+func clearTestDb() {
+	// use credentials without db in order to create db
+	db, err := sql.Open(env.GetSQLDriver(), env.GetSQLServerDsn())
+	if err != nil {
+		logs.Error(err)
+	}
+	ctx := store.GetDefaultDBContext()
+	conn, err := db.Conn(ctx)
+	if err != nil {
+		logs.Error(err)
+	}
+	defer conn.Close()
+	_, err = conn.ExecContext(ctx, "DROP DATABASE "+env.GetMySQLTestDb())
+	if err != nil {
+		logs.Error(err)
+	}
+	_, err = conn.ExecContext(ctx, "CREATE DATABASE IF NOT EXISTS "+env.GetMySQLTestDb())
+	if err != nil {
+		logs.Error(err)
+	}
+}
+
 func beforeEachTest() {
 	if !testAppInited {
 		initConfig()
@@ -33,6 +56,7 @@ func beforeEachTest() {
 		initFixtures()
 		testAppInited = true
 	}
+	clearTestDb()
 	restoreFromDump()
 }
 
@@ -44,14 +68,12 @@ func setTestAppEnv() {
 }
 
 func restoreFromDump() {
-	helpers.RunCmd(
-		"mysql",
-		"-u"+env.GetMySQLUser(),
-		"-p"+env.GetMySQLUserPass(),
-		env.GetMySQLTestDb(),
-		"<",
-		getDbDumpFile(),
-	)
+	os.Chdir(env.GetAppRoot())
+	cmd := exec.Command("make", constants.RestoreTestDbDump)
+	_, err := cmd.Output()
+	if err != nil {
+		logs.Error(err)
+	}
 }
 
 func getDbDumpFile() string {

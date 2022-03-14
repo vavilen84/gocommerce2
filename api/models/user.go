@@ -29,6 +29,8 @@ type User struct {
 	CreatedAt int  `json:"created_at" orm:"column(created_at)"`
 	UpdatedAt int  `json:"updated_at" orm:"column(updated_at)"`
 	DeletedAt *int `json:"deleted_at" orm:"column(deleted_at)"`
+
+	ValidationErrors map[string][]string `orm:"-"`
 }
 
 func (m *User) FindByEmail(o orm.Ormer) (err error) {
@@ -48,13 +50,10 @@ func FindUserById(o orm.Ormer, id int64) (m User, err error) {
 }
 
 func InsertUser(o orm.Ormer, m *User) (err error) {
-	isValid := m.validatePassword()
-	if !isValid {
-		return
-	}
+	m.validatePassword()
 	m.setPassword()
 	m.setTimestampsOnInsert()
-	isValid = m.validateOnInsert(o)
+	isValid := m.validateOnInsert(o)
 	if !isValid {
 		return
 	}
@@ -141,17 +140,14 @@ func (m *User) ValidateUserExists(o orm.Ormer, valid *validation.Validation) {
 	}
 }
 
-func (m *User) validatePassword() bool {
+func (m *User) validatePassword() {
 	valid := validation.Validation{}
 	valid.Required(m.Password, "password")
 	valid.MaxSize(m.Password, 16, "password")
 	if valid.HasErrors() {
-		for _, err := range valid.Errors {
-			logs.Error(err)
-		}
-		return false
+		m.SetValidationErrors(valid.Errors)
+		m.LogValidationErrors(valid.Errors)
 	}
-	return true
 }
 
 func (m *User) validateCommonFields(valid *validation.Validation) {
@@ -181,12 +177,34 @@ func (m *User) validateOnUpdate(o orm.Ormer) bool {
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		for _, err := range valid.Errors {
-			logs.Error(err)
-		}
+		m.SetValidationErrors(valid.Errors)
+		m.LogValidationErrors(valid.Errors)
 		return false
 	}
 	return true
+}
+
+func (m *User) SetValidationErrors(errors []*validation.Error) {
+	if errors == nil || len(errors) == 0 {
+		return
+	}
+	if len(m.ValidationErrors) == 0 {
+		m.ValidationErrors = make(map[string][]string)
+	}
+	for _, err := range errors {
+		if _, ok := m.ValidationErrors[err.Key]; !ok {
+			m.ValidationErrors[err.Key] = make([]string, 1)
+			m.ValidationErrors[err.Key][0] = err.Message
+		} else {
+			m.ValidationErrors[err.Key] = append(m.ValidationErrors[err.Key], err.Message)
+		}
+	}
+}
+
+func (m *User) LogValidationErrors(errors []*validation.Error) {
+	for _, err := range errors {
+		logs.Error("Validation error; Model: %v; Key: %v; Message: %v", constants.UserModel, err.Key, err.Message)
+	}
 }
 
 func (m *User) validateOnInsert(o orm.Ormer) bool {
@@ -194,9 +212,8 @@ func (m *User) validateOnInsert(o orm.Ormer) bool {
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		for _, err := range valid.Errors {
-			logs.Error("Validation error; Model: %v; Key: %v; Message: %v", constants.UserModel, err.Key, err.Message)
-		}
+		m.SetValidationErrors(valid.Errors)
+		m.LogValidationErrors(valid.Errors)
 		return false
 	}
 	return true

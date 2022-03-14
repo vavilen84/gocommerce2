@@ -32,8 +32,16 @@ func GetMySQLUser() string {
 	return os.Getenv(constants.MysqlUserEnvVar)
 }
 
+func GetMySQLTestUser() string {
+	return os.Getenv(constants.MysqlTestUserEnvVar)
+}
+
 func GetMySQLUserPass() string {
 	return os.Getenv(constants.MysqlPasswordEnvVar)
+}
+
+func GetMySQLTestUserPass() string {
+	return os.Getenv(constants.MysqlTestUserPasswordEnvVar)
 }
 
 func GetSQLDriver() string {
