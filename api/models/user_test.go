@@ -46,6 +46,13 @@ func Test_InsertUser(t *testing.T) {
 	assert.NotEmpty(t, userFromDb.CreatedAt)
 	assert.NotEmpty(t, userFromDb.UpdatedAt)
 	assert.Empty(t, userFromDb.DeletedAt)
+
+	// insert user with the same email
+	userWithTheSameEmail := User{Email: u.Email}
+	err = InsertUser(o, &userWithTheSameEmail)
+	assert.Nil(t, err)
+	assert.Empty(t, userWithTheSameEmail.Id)
+	assert.NotEmpty(t, userWithTheSameEmail.ValidationErrors["email"])
 }
 
 func Test_FindUserById(t *testing.T) {

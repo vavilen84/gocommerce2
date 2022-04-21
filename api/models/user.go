@@ -52,8 +52,8 @@ func FindUserById(o orm.Ormer, id int64) (m User, err error) {
 
 func InsertUser(o orm.Ormer, m *User) (err error) {
 	m.clearValidationErrors()
-	m.validatePassword()
-	m.setPassword()
+	m.validateRawPassword()
+	m.encodePassword()
 	m.setTimestampsOnInsert()
 	isValid := m.validateOnInsert(o)
 	if !isValid {
@@ -89,7 +89,7 @@ func (m *User) setPasswordOnUpdate(o orm.Ormer) {
 		logs.Error(err)
 	}
 	if m.Password != "" {
-		m.setPassword()
+		m.encodePassword()
 	} else {
 		m.Password = oldUser.Password
 		m.Salt = oldUser.Salt
@@ -107,21 +107,20 @@ func (m *User) setTimestampsOnUpdate() {
 	m.UpdatedAt = now
 }
 
-func (m *User) setPassword() {
+func (m *User) encodePassword() {
 	salt, encodedPwd := password.Encode(m.Password, nil)
 	m.Password = encodedPwd
 	m.Salt = salt
 }
 
 func (m *User) validateEmailAlreadyInUse(o orm.Ormer, valid *validation.Validation) {
-	u := User{Email: m.Email}
-	_, err := FindUserByEmail(o, m.Email)
+	userFromDb, err := FindUserByEmail(o, m.Email)
 	if err != nil {
 		if err != orm.ErrNoRows {
 			logs.Error(err)
 		}
 	} else {
-		if (u.Id != 0) && (u.Id != m.Id) {
+		if (userFromDb.Id != 0) && (m.Id != userFromDb.Id) {
 			err := valid.SetError("email", "Email is already in use")
 			if err != nil {
 				logs.Error(err)
@@ -143,7 +142,7 @@ func (m *User) ValidateUserExists(o orm.Ormer, valid *validation.Validation) {
 	}
 }
 
-func (m *User) validatePassword() {
+func (m *User) validateRawPassword() {
 	valid := validation.Validation{}
 	valid.Required(m.Password, "password")
 	valid.MaxSize(m.Password, 16, "password")
