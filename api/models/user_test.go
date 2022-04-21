@@ -18,7 +18,6 @@ func Test_InsertUser(t *testing.T) {
 	assert.Empty(t, u.Id)
 	assert.NotEmpty(t, u.ValidationErrors["email"])
 	assert.NotEmpty(t, u.ValidationErrors["password"])
-	assert.NotEmpty(t, u.ValidationErrors["salt"])
 	assert.NotEmpty(t, u.ValidationErrors["first_name"])
 	assert.NotEmpty(t, u.ValidationErrors["last_name"])
 	assert.NotEmpty(t, u.ValidationErrors["role"])
@@ -30,7 +29,7 @@ func Test_InsertUser(t *testing.T) {
 	err = InsertUser(o, &u)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, u.Id)
-	assert.Nil(t, u.ValidationErrors)
+	assert.Empty(t, u.ValidationErrors)
 
 	// find inserted user
 	userFromDb, err := FindUserById(o, u.Id)
@@ -58,7 +57,7 @@ func Test_FindUserById(t *testing.T) {
 	err := InsertUser(o, &u)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, u.Id)
-	assert.Nil(t, u.ValidationErrors)
+	assert.Empty(t, u.ValidationErrors)
 
 	// user successfully found
 	userFromDb, err := FindUserById(o, u.Id)

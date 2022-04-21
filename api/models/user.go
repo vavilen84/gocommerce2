@@ -33,12 +33,13 @@ type User struct {
 	ValidationErrors map[string][]string `orm:"-"`
 }
 
-func (m *User) FindByEmail(o orm.Ormer) (err error) {
-	err = o.QueryTable(constants.UserModel).Filter("email", m.Email).One(m)
+func FindUserByEmail(o orm.Ormer, email string) (*User, error) {
+	u := User{}
+	err := o.QueryTable(constants.UserModel).Filter("email", email).One(&u)
 	if err != nil {
 		logs.Error(err)
 	}
-	return
+	return &u, err
 }
 
 func FindUserById(o orm.Ormer, id int64) (m User, err error) {
@@ -114,7 +115,7 @@ func (m *User) setPassword() {
 
 func (m *User) validateEmailAlreadyInUse(o orm.Ormer, valid *validation.Validation) {
 	u := User{Email: m.Email}
-	err := u.FindByEmail(o)
+	_, err := FindUserByEmail(o, m.Email)
 	if err != nil {
 		if err != orm.ErrNoRows {
 			logs.Error(err)
