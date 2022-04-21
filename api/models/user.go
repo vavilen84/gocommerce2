@@ -50,6 +50,7 @@ func FindUserById(o orm.Ormer, id int64) (m User, err error) {
 }
 
 func InsertUser(o orm.Ormer, m *User) (err error) {
+	m.clearValidationErrors()
 	m.validatePassword()
 	m.setPassword()
 	m.setTimestampsOnInsert()
@@ -66,7 +67,8 @@ func InsertUser(o orm.Ormer, m *User) (err error) {
 	return
 }
 
-func UpdateUser(o orm.Ormer, m User) (err error) {
+func UpdateUser(o orm.Ormer, m *User) (err error) {
+	m.clearValidationErrors()
 	m.setPasswordOnUpdate(o)
 	m.setTimestampsOnUpdate()
 	isValid := m.validateOnUpdate(o)
@@ -156,8 +158,9 @@ func (m *User) validateCommonFields(valid *validation.Validation) {
 	valid.Email(m.Email, "email")
 
 	valid.Required(m.Salt, "salt")
+	valid.Required(m.Password, "password")
 
-	valid.Required(m.Role, "salt")
+	valid.Required(m.Role, "role")
 	valid.Range(m.Role, UserRoleCustomer, UserRoleAdmin, "role")
 
 	valid.Required(m.FirstName, "first_name")
@@ -168,6 +171,10 @@ func (m *User) validateCommonFields(valid *validation.Validation) {
 
 	valid.Required(m.CreatedAt, "created_at")
 	valid.Required(m.UpdatedAt, "updated_at")
+}
+
+func (m *User) clearValidationErrors() {
+	m.ValidationErrors = make(map[string][]string)
 }
 
 func (m *User) validateOnUpdate(o orm.Ormer) bool {
