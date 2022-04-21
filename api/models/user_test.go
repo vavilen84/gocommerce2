@@ -45,7 +45,6 @@ func Test_InsertUser(t *testing.T) {
 	assert.Equal(t, u.LastName, userFromDb.LastName)
 	assert.NotEmpty(t, userFromDb.CreatedAt)
 	assert.NotEmpty(t, userFromDb.UpdatedAt)
-	assert.Empty(t, userFromDb.DeletedAt)
 
 	// insert user with the same email
 	userWithTheSameEmail := User{Email: u.Email}
@@ -107,7 +106,6 @@ func Test_UpdateUser(t *testing.T) {
 	assert.Equal(t, u.LastName, userFromDb.LastName)
 	assert.NotEmpty(t, userFromDb.CreatedAt)
 	assert.NotEmpty(t, userFromDb.UpdatedAt)
-	assert.Empty(t, userFromDb.DeletedAt)
 
 	// check validation
 	emptyUser := User{}
@@ -154,5 +152,47 @@ func Test_UpdateUser(t *testing.T) {
 	assert.NotEmpty(t, userFromDb.CreatedAt)
 	assert.Equal(t, u.CreatedAt, userFromDb.CreatedAt)
 	assert.NotEmpty(t, userFromDb.UpdatedAt)
-	assert.Empty(t, userFromDb.DeletedAt)
+}
+
+func Test_DeleteUser(t *testing.T) {
+	beforeEachTest()
+	o := orm.NewOrm()
+
+	// delete not existing user
+	u := User{}
+	err := DeleteUser(o, &u)
+	assert.NotNil(t, err)
+
+	u = usersFixtures[user1key]
+	rawPassword := u.Password
+
+	// successfully inserted
+	err = InsertUser(o, &u)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, u.Id)
+	assert.Empty(t, u.ValidationErrors)
+
+	// find inserted user
+	userFromDb, err := FindUserById(o, u.Id)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, userFromDb.Id)
+	assert.Equal(t, u.Id, userFromDb.Id)
+	assert.Equal(t, u.Email, userFromDb.Email)
+	assert.NotEmpty(t, userFromDb.Password)
+	assert.NotEmpty(t, userFromDb.Salt)
+	assert.True(t, password.Verify(rawPassword, userFromDb.Salt, userFromDb.Password, nil))
+	assert.Equal(t, u.Role, userFromDb.Role)
+	assert.Equal(t, u.FirstName, userFromDb.FirstName)
+	assert.Equal(t, u.LastName, userFromDb.LastName)
+	assert.NotEmpty(t, userFromDb.CreatedAt)
+	assert.NotEmpty(t, userFromDb.UpdatedAt)
+
+	// delete user
+	err = DeleteUser(o, &u)
+	assert.Nil(t, err)
+
+	// try to find deleted user
+	userFromDb, err = FindUserById(o, u.Id)
+	assert.NotNil(t, err)
+	assert.Empty(t, userFromDb.Id)
 }

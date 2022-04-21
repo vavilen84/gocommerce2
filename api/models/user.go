@@ -26,9 +26,8 @@ type User struct {
 	FirstName string `json:"first_name" orm:"column(first_name)"`
 	LastName  string `json:"last_name" orm:"column(last_name)"`
 
-	CreatedAt int  `json:"created_at" orm:"column(created_at)"`
-	UpdatedAt int  `json:"updated_at" orm:"column(updated_at)"`
-	DeletedAt *int `json:"deleted_at" orm:"column(deleted_at)"`
+	CreatedAt int `json:"created_at" orm:"column(created_at)"`
+	UpdatedAt int `json:"updated_at" orm:"column(updated_at)"`
 
 	ValidationErrors map[string][]string `orm:"-"`
 }
@@ -77,6 +76,19 @@ func UpdateUser(o orm.Ormer, m *User) (err error) {
 		return
 	}
 	_, err = o.Update(m)
+	if err != nil {
+		logs.Error(err)
+	}
+	return
+}
+
+func DeleteUser(o orm.Ormer, m *User) (err error) {
+	_, err = FindUserById(o, m.Id)
+	if err != nil {
+		logs.Error(err)
+		return
+	}
+	_, err = o.Delete(m)
 	if err != nil {
 		logs.Error(err)
 	}

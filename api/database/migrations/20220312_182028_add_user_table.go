@@ -28,8 +28,7 @@ func (m *AddUserTable_20220312_182028) Up() {
 		"last_name VARCHAR(255)," +
 		"role SMALLINT," +
 		"created_at INT(11)," +
-		"updated_at INT(11)," +
-		"deleted_at INT(11)" +
+		"updated_at INT(11)" +
 		");")
 	m.SQL("ALTER TABLE user ADD UNIQUE INDEX email_idx(email);")
 }
