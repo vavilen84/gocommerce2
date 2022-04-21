@@ -129,7 +129,7 @@ func (m *User) validateEmailAlreadyInUse(o orm.Ormer, valid *validation.Validati
 	}
 }
 
-func (m *User) ValidateUserExists(o orm.Ormer, valid *validation.Validation) {
+func (m *User) validateUserExists(o orm.Ormer, valid *validation.Validation) {
 	_, err := FindUserById(o, m.Id)
 	if err != nil {
 		if err != orm.ErrNoRows {
@@ -147,8 +147,8 @@ func (m *User) validateRawPassword() {
 	valid.Required(m.Password, "password")
 	valid.MaxSize(m.Password, 16, "password")
 	if valid.HasErrors() {
-		m.SetValidationErrors(valid.Errors)
-		m.LogValidationErrors(valid.Errors)
+		m.setValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors)
 	}
 }
 
@@ -180,18 +180,18 @@ func (m *User) clearValidationErrors() {
 func (m *User) validateOnUpdate(o orm.Ormer) bool {
 	valid := validation.Validation{}
 	valid.Required(m.Id, "id")
-	m.ValidateUserExists(o, &valid)
+	m.validateUserExists(o, &valid)
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		m.SetValidationErrors(valid.Errors)
-		m.LogValidationErrors(valid.Errors)
+		m.setValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors)
 		return false
 	}
 	return true
 }
 
-func (m *User) SetValidationErrors(errors []*validation.Error) {
+func (m *User) setValidationErrors(errors []*validation.Error) {
 	if errors == nil || len(errors) == 0 {
 		return
 	}
@@ -208,7 +208,7 @@ func (m *User) SetValidationErrors(errors []*validation.Error) {
 	}
 }
 
-func (m *User) LogValidationErrors(errors []*validation.Error) {
+func (m *User) logValidationErrors(errors []*validation.Error) {
 	for _, err := range errors {
 		logs.Error("Validation error; Model: %v; Key: %v; Message: %v", constants.UserModel, err.Key, err.Message)
 	}
@@ -219,8 +219,8 @@ func (m *User) validateOnInsert(o orm.Ormer) bool {
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		m.SetValidationErrors(valid.Errors)
-		m.LogValidationErrors(valid.Errors)
+		m.setValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors)
 		return false
 	}
 	return true
