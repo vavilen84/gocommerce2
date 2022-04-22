@@ -2,13 +2,13 @@ package models
 
 import (
 	"api/constants"
+	"api/helpers"
 	"fmt"
 	"github.com/anaskhan96/go-password-encoder"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 )
 
 const (
@@ -18,18 +18,15 @@ const (
 )
 
 type User struct {
-	Id        int64  `json:"id" orm:"auto"`
+	BaseModel
 	Email     string `json:"email" orm:"column(email);unique"`
 	Password  string `json:"password" orm:"column(password)"`
 	Salt      string `json:"salt" orm:"column(salt)"`
 	Role      int    `json:"role" orm:"column(role)"`
 	FirstName string `json:"first_name" orm:"column(first_name)"`
 	LastName  string `json:"last_name" orm:"column(last_name)"`
-
-	CreatedAt int `json:"created_at" orm:"column(created_at)"`
-	UpdatedAt int `json:"updated_at" orm:"column(updated_at)"`
-
-	ValidationErrors map[string][]string `orm:"-"`
+	CreatedAt int    `json:"created_at" orm:"column(created_at)"`
+	UpdatedAt int    `json:"updated_at" orm:"column(updated_at)"`
 }
 
 func FindUserByEmail(o orm.Ormer, email string) (*User, error) {
@@ -109,13 +106,13 @@ func (m *User) setPasswordOnUpdate(o orm.Ormer) {
 }
 
 func (m *User) setTimestampsOnInsert() {
-	now := int(time.Now().Unix())
+	now := helpers.GetNowUTCTimestamp()
 	m.CreatedAt = now
 	m.UpdatedAt = now
 }
 
 func (m *User) setTimestampsOnUpdate() {
-	now := int(time.Now().Unix())
+	now := helpers.GetNowUTCTimestamp()
 	m.UpdatedAt = now
 }
 
@@ -141,7 +138,7 @@ func (m *User) validateEmailAlreadyInUse(o orm.Ormer, valid *validation.Validati
 	}
 }
 
-func (m *User) validateUserExists(o orm.Ormer, valid *validation.Validation) {
+func (m *User) ValidateUserExists(o orm.Ormer, valid *validation.Validation) {
 	_, err := FindUserById(o, m.Id)
 	if err != nil {
 		if err != orm.ErrNoRows {
@@ -160,7 +157,7 @@ func (m *User) validateRawPassword() {
 	valid.MaxSize(m.Password, 16, "password")
 	if valid.HasErrors() {
 		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors, constants.UserModel)
 	}
 }
 
@@ -185,45 +182,18 @@ func (m *User) validateCommonFields(valid *validation.Validation) {
 	valid.Required(m.UpdatedAt, "updated_at")
 }
 
-func (m *User) clearValidationErrors() {
-	m.ValidationErrors = make(map[string][]string)
-}
-
 func (m *User) validateOnUpdate(o orm.Ormer) bool {
 	valid := validation.Validation{}
 	valid.Required(m.Id, "id")
-	m.validateUserExists(o, &valid)
+	m.ValidateUserExists(o, &valid)
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
 		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors, constants.UserModel)
 		return false
 	}
 	return true
-}
-
-func (m *User) setValidationErrors(errors []*validation.Error) {
-	if errors == nil || len(errors) == 0 {
-		return
-	}
-	if len(m.ValidationErrors) == 0 {
-		m.ValidationErrors = make(map[string][]string)
-	}
-	for _, err := range errors {
-		if _, ok := m.ValidationErrors[err.Key]; !ok {
-			m.ValidationErrors[err.Key] = make([]string, 1)
-			m.ValidationErrors[err.Key][0] = err.Message
-		} else {
-			m.ValidationErrors[err.Key] = append(m.ValidationErrors[err.Key], err.Message)
-		}
-	}
-}
-
-func (m *User) logValidationErrors(errors []*validation.Error) {
-	for _, err := range errors {
-		logs.Error("Validation error; Model: %v; Key: %v; Message: %v", constants.UserModel, err.Key, err.Message)
-	}
 }
 
 func (m *User) validateOnInsert(o orm.Ormer) bool {
@@ -232,7 +202,7 @@ func (m *User) validateOnInsert(o orm.Ormer) bool {
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
 		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors)
+		m.logValidationErrors(valid.Errors, constants.UserModel)
 		return false
 	}
 	return true
