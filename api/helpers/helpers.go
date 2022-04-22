@@ -77,3 +77,8 @@ func suppressErr(i string) string {
 	}
 	return i
 }
+
+func GetNowUTCTimestamp() int {
+	now := time.Now()
+	return int(now.UTC().Unix())
+}

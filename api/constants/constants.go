@@ -84,6 +84,7 @@ const (
 	MigrationModel = "Migration"
 	ProductModel   = "Product"
 	UserModel      = "User"
+	JWTInfoModel   = "JWTInfo"
 
 	// field names
 
