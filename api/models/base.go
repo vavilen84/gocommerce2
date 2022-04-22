@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/constants"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/beego/v2/core/logs"
@@ -19,6 +20,11 @@ type BaseModel struct {
 
 func (m *BaseModel) clearValidationErrors() {
 	m.ValidationErrors = make(map[string][]string)
+}
+
+func (m *BaseModel) handleValidationErrors(errors []*validation.Error, modelName string) {
+	m.setValidationErrors(errors)
+	m.logValidationErrors(errors, constants.JWTInfoModel)
 }
 
 func (m *BaseModel) setValidationErrors(errors []*validation.Error) {
