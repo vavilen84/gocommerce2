@@ -2,9 +2,44 @@ package models
 
 import (
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/validation"
+	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
 	orm.RegisterModel(new(User))
+	orm.RegisterModel(new(JWTInfo))
+}
+
+type BaseModel struct {
+	Id               int64               `json:"id" orm:"auto"`
+	ValidationErrors map[string][]string `orm:"-"`
+}
+
+func (m *BaseModel) clearValidationErrors() {
+	m.ValidationErrors = make(map[string][]string)
+}
+
+func (m *BaseModel) setValidationErrors(errors []*validation.Error) {
+	if errors == nil || len(errors) == 0 {
+		return
+	}
+	if len(m.ValidationErrors) == 0 {
+		m.ValidationErrors = make(map[string][]string)
+	}
+	for _, err := range errors {
+		if _, ok := m.ValidationErrors[err.Key]; !ok {
+			m.ValidationErrors[err.Key] = make([]string, 1)
+			m.ValidationErrors[err.Key][0] = err.Message
+		} else {
+			m.ValidationErrors[err.Key] = append(m.ValidationErrors[err.Key], err.Message)
+		}
+	}
+}
+
+func (m *BaseModel) logValidationErrors(errors []*validation.Error, modelName string) {
+	for _, err := range errors {
+		logs.Error("Validation error; Model: %v; Key: %v; Message: %v", modelName, err.Key, err.Message)
+	}
 }
