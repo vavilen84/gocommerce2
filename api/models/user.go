@@ -156,8 +156,7 @@ func (m *User) validateRawPassword() {
 	valid.Required(m.Password, "password")
 	valid.MaxSize(m.Password, 16, "password")
 	if valid.HasErrors() {
-		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors, constants.UserModel)
+		m.handleValidationErrors(valid.Errors, constants.UserModel)
 	}
 }
 
@@ -189,8 +188,7 @@ func (m *User) validateOnUpdate(o orm.Ormer) bool {
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors, constants.UserModel)
+		m.handleValidationErrors(valid.Errors, constants.UserModel)
 		return false
 	}
 	return true
@@ -201,8 +199,7 @@ func (m *User) validateOnInsert(o orm.Ormer) bool {
 	m.validateCommonFields(&valid)
 	m.validateEmailAlreadyInUse(o, &valid)
 	if valid.HasErrors() {
-		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors, constants.UserModel)
+		m.handleValidationErrors(valid.Errors, constants.UserModel)
 		return false
 	}
 	return true

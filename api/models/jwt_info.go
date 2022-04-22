@@ -43,11 +43,15 @@ func (m *JWTInfo) validateOnInsert(o orm.Ormer) bool {
 	valid.Required(m.CreatedAt, "created_at")
 	valid.Required(m.ExpiresAt, "expires_at")
 
+	if valid.HasErrors() {
+		m.handleValidationErrors(valid.Errors, constants.JWTInfoModel)
+		return false
+	}
+
 	m.User.ValidateUserExists(o, &valid)
 
 	if valid.HasErrors() {
-		m.setValidationErrors(valid.Errors)
-		m.logValidationErrors(valid.Errors, constants.JWTInfoModel)
+		m.handleValidationErrors(valid.Errors, constants.JWTInfoModel)
 		return false
 	}
 	return true
