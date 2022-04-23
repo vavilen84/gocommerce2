@@ -1,8 +1,8 @@
 package services
 
 import (
-	"api/helpers"
 	"api/models"
+	"encoding/base64"
 	"encoding/json"
 	"github.com/astaxie/beego/orm"
 	"github.com/beego/beego/v2/core/logs"
@@ -21,16 +21,9 @@ type JWTPayload struct {
 	JWTInfoId int64 `json:"jwt_info_id"`
 }
 
-func (a *JWTAuthService) generateJWTSecret() string {
-	return ""
-}
-
 func (a *JWTAuthService) insertJWTInfo(o orm.Ormer) (jwtInfo models.JWTInfo, err error) {
-	now := helpers.GetNowUTCTimestamp()
 	jwtInfo = models.JWTInfo{
-		User:      &a.User,
-		Secret:    a.generateJWTSecret(),
-		CreatedAt: now,
+		User: &a.User,
 	}
 	err = models.InsertJWTInfo(o, &jwtInfo)
 	if err != nil {
@@ -77,7 +70,11 @@ func (a *JWTAuthService) parseJWTPayload(token []byte) (jwtPayload JWTPayload, e
 	}
 	matches := re.FindStringSubmatch(string(token))
 	i := re.SubexpIndex("payload")
-	err = json.Unmarshal([]byte(matches[i]), &jwtPayload)
+	payloadData, err := base64.StdEncoding.DecodeString(matches[i])
+	if err != nil {
+		logs.Error(err)
+	}
+	err = json.Unmarshal(payloadData, &jwtPayload)
 	if err != nil {
 		logs.Error(err)
 	}
