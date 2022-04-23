@@ -31,7 +31,7 @@ type User struct {
 
 func FindUserByEmail(o orm.Ormer, email string) (*User, error) {
 	u := User{}
-	err := o.QueryTable(constants.UserModel).Filter("email", email).One(&u)
+	err := o.QueryTable(constants.UserDBTable).Filter("email", email).One(&u)
 	if err != nil {
 		logs.Error(err)
 	}
@@ -39,7 +39,7 @@ func FindUserByEmail(o orm.Ormer, email string) (*User, error) {
 }
 
 func FindUserById(o orm.Ormer, id int64) (m User, err error) {
-	err = o.QueryTable(constants.UserModel).Filter("id", id).One(&m)
+	err = o.QueryTable(constants.UserDBTable).Filter("id", id).One(&m)
 	if err != nil {
 		logs.Error(err)
 	}
