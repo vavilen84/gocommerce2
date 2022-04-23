@@ -57,7 +57,8 @@ const (
 	OrderProductDiscountDBTable = "order_product_discount"
 	OrderDiscountDBTable        = "order_discount"
 	TaxDBTable                  = "tax"
-	JWTInfoTableName            = "jwt_info"
+	JWTInfoDBTable              = "jwt_info"
+	UserDBTable                 = "user"
 
 	// migrations
 	MigrationsFolder = "migrations"

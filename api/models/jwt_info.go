@@ -20,7 +20,7 @@ type JWTInfo struct {
 }
 
 func (m *JWTInfo) TableName() string {
-	return constants.JWTInfoTableName
+	return constants.JWTInfoDBTable
 }
 
 func InsertJWTInfo(o orm.Ormer, m *JWTInfo) (err error) {
@@ -37,6 +37,14 @@ func InsertJWTInfo(o orm.Ormer, m *JWTInfo) (err error) {
 		return
 	}
 	m.Id = id
+	return
+}
+
+func FindJWTInfoById(o orm.Ormer, id int64) (jwtInfo JWTInfo, err error) {
+	err = o.QueryTable(constants.JWTInfoDBTable).Filter("id", id).One(&jwtInfo)
+	if err != nil {
+		logs.Error(err)
+	}
 	return
 }
 

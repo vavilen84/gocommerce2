@@ -28,4 +28,14 @@ func Test_InsertJWTInfo(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, jwtInfo.Id)
 	assert.Empty(t, jwtInfo.ValidationErrors)
+
+	// find created jwt info
+	m, err := FindJWTInfoById(o, jwtInfo.Id)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, m.Id)
+	assert.Equal(t, jwtInfo.Id, m.Id)
+	assert.Equal(t, jwtInfo.User.Id, m.User.Id)
+	assert.Equal(t, jwtInfo.Secret, m.Secret)
+	assert.Equal(t, jwtInfo.CreatedAt, m.CreatedAt)
+	assert.Equal(t, jwtInfo.ExpiresAt, m.ExpiresAt)
 }
