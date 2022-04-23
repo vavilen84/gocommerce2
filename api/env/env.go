@@ -3,7 +3,9 @@ package env
 import (
 	"api/constants"
 	"fmt"
+	"github.com/beego/beego/v2/core/logs"
 	"os"
+	"strconv"
 )
 
 func GetDbDsn(dbname string) string {
@@ -62,4 +64,13 @@ func GetAppRoot() string {
 
 func GetSecret() string {
 	return os.Getenv(constants.SecretEnvVar)
+}
+
+func GetJWTExpireDurationDays() int {
+	resultString := os.Getenv(constants.JWTExpireDurationDays)
+	resultInt, err := strconv.Atoi(resultString)
+	if err != nil {
+		logs.Error(err)
+	}
+	return resultInt
 }

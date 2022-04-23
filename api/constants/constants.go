@@ -9,6 +9,9 @@ const (
 	TestDbDumpFile = "test_db_dump.sql"
 	SecretEnvVar   = "SECRET"
 
+	// app config env vars
+	JWTExpireDurationDays = "JWT_EXPIRE_DURATION_DAYS"
+
 	// DEPRECATED! use default db & user for testing purposes
 	// test db & test user
 	TestingDB                   = "testing" // reference docker/db/docker-entrypoint-initdb.d/test.db-sql
@@ -54,6 +57,7 @@ const (
 	OrderProductDiscountDBTable = "order_product_discount"
 	OrderDiscountDBTable        = "order_discount"
 	TaxDBTable                  = "tax"
+	JWTInfoTableName            = "jwt_info"
 
 	// migrations
 	MigrationsFolder = "migrations"
