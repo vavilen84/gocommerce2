@@ -24,6 +24,7 @@ func (m *AddJwtInfoTable_20220422_174443) Up() {
 		"user_id INT NOT NULL, " +
 		"secret VARCHAR(255), " +
 		"created_at INT(11)," +
+		"updated_at INT(11)," +
 		"expires_at INT(11)" +
 		");")
 	m.SQL("ALTER TABLE jwt_info ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES user(id);")
