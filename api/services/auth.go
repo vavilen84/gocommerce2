@@ -1,6 +1,8 @@
 package services
 
 import (
+	"api/env"
+	"api/helpers"
 	"api/models"
 	"encoding/base64"
 	"encoding/json"
@@ -13,7 +15,8 @@ import (
 )
 
 type JWTAuthService struct {
-	User models.User
+	User           models.User
+	ExpirationTime int
 }
 
 type JWTPayload struct {
@@ -21,9 +24,20 @@ type JWTPayload struct {
 	JWTInfoId int64 `json:"jwt_info_id"`
 }
 
+func (a *JWTAuthService) getExpirationTime() (expirationTime int) {
+	expiresAt := time.Now().Add(time.Duration(env.GetJWTExpireDurationDays()) * 24 * time.Hour)
+	if a.ExpirationTime == 0 {
+		expirationTime = int(expiresAt.UTC().Unix())
+	} else {
+		expirationTime = a.ExpirationTime
+	}
+	return
+}
+
 func (a *JWTAuthService) insertJWTInfo(o orm.Ormer) (jwtInfo models.JWTInfo, err error) {
 	jwtInfo = models.JWTInfo{
-		User: &a.User,
+		User:      &a.User,
+		ExpiresAt: a.getExpirationTime(),
 	}
 	err = models.InsertJWTInfo(o, &jwtInfo)
 	if err != nil {
@@ -34,10 +48,9 @@ func (a *JWTAuthService) insertJWTInfo(o orm.Ormer) (jwtInfo models.JWTInfo, err
 
 func (a *JWTAuthService) generateJWT(jwtInfo models.JWTInfo) (token []byte, err error) {
 	algorithm := jwt.NewHS256([]byte(jwtInfo.Secret))
-	expirationTime := time.Unix(int64(jwtInfo.ExpiresAt), 0)
 	payload := JWTPayload{
 		Payload: jwt.Payload{
-			ExpirationTime: jwt.NumericDate(expirationTime),
+			ExpirationTime: jwt.NumericDate(time.Unix(int64(a.getExpirationTime()), 0)),
 			IssuedAt:       jwt.NumericDate(time.Now()),
 		},
 		JWTInfoId: jwtInfo.Id,
@@ -96,6 +109,10 @@ func (a *JWTAuthService) VerifyJWT(o orm.Ormer, token []byte) (isValid bool, err
 	_, err = jwt.Verify(token, algorithm, &payload)
 	if err != nil {
 		logs.Error(err)
+		return
+	}
+	now := helpers.GetNowUTCTimestamp()
+	if int(payload.ExpirationTime.UTC().Unix()) < now {
 		return
 	}
 	isValid = true

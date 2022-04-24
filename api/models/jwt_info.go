@@ -2,13 +2,11 @@ package models
 
 import (
 	"api/constants"
-	"api/env"
 	"api/helpers"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 )
 
 type JWTInfo struct {
@@ -53,9 +51,7 @@ func (m *JWTInfo) generateSecret() {
 }
 
 func (m *JWTInfo) setTimestampsOnInsert() {
-	expiresAt := time.Now().Add(time.Duration(env.GetJWTExpireDurationDays()) * 24 * time.Hour)
 	m.CreatedAt = helpers.GetNowUTCTimestamp()
-	m.ExpiresAt = int(expiresAt.UTC().Unix())
 }
 
 func (m *JWTInfo) clearValidationErrors() {
