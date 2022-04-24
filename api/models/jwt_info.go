@@ -3,9 +3,9 @@ package models
 import (
 	"api/constants"
 	"api/helpers"
-	"github.com/beego/beego/v2/core/validation"
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/core/validation"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -13,7 +13,6 @@ type JWTInfo struct {
 	BaseModel
 	User      *User  `orm:"rel(fk)"`
 	Secret    string `json:"string"`
-	CreatedAt int    `json:"created_at" orm:"column(created_at)"`
 	ExpiresAt int    `json:"expires_at" orm:"column(expires_at)"`
 }
 
