@@ -16,6 +16,8 @@ type Product struct {
 	Title string `json:"title" orm:"column(title)"`
 	SKU   string `json:"sku" orm:"column(sku)"`
 	Price int    `json:"price" orm:"column(price)"`
+
+	Categories []*Category `orm:"rel(m2m);rel_through(api/models.PostTags)"`
 }
 
 func (m *Product) TableName() string {

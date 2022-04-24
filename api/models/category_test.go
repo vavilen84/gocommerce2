@@ -4,6 +4,7 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -36,7 +37,7 @@ func Test_InsertCategory(t *testing.T) {
 	assert.NotEmpty(t, categoryFromDb.UpdatedAt)
 
 	// insert category with the same title
-	categoryWithTheSameTitle := Category{Title: categoryFromDb.Title}
+	categoryWithTheSameTitle := Category{Title: strings.ToLower(categoryFromDb.Title)}
 	err = InsertCategory(o, &categoryWithTheSameTitle)
 	assert.Nil(t, err)
 	assert.Empty(t, categoryWithTheSameTitle.Id)
