@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"api/constants"
+	"api/env"
 	"errors"
 	"fmt"
 	"github.com/beego/beego/v2/core/logs"
@@ -81,4 +82,8 @@ func suppressErr(i string) string {
 func GetNowUTCTimestamp() int {
 	now := time.Now()
 	return int(now.UTC().Unix())
+}
+
+func GetDefaultJWTExpiresAt() int {
+	return int(time.Now().Add(time.Duration(env.GetJWTExpireDurationDays()) * 24 * time.Hour).UTC().Unix())
 }
