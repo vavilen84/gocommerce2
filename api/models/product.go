@@ -2,11 +2,10 @@ package models
 
 import (
 	"api/constants"
-	"errors"
 	"fmt"
-	"github.com/beego/beego/v2/core/validation"
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/core/validation"
 	_ "github.com/go-sql-driver/mysql"
 	"regexp"
 	"time"
@@ -50,12 +49,9 @@ func (m *Product) validateCommonFields(valid *validation.Validation) {
 func (m *Product) validateOnUpdate(o orm.Ormer) error {
 	valid := validation.Validation{}
 	m.validateCommonFields(&valid)
+	m.ValidateProductExists(o, &valid)
 	if valid.HasErrors() {
-		for _, err := range valid.Errors {
-			logs.Error(err)
-		}
-		e := errors.New(fmt.Sprintf("Model %v is not valid", constants.ProductModel))
-		return e
+		m.handleValidationErrors(valid.Errors, constants.ProductModel)
 	}
 	return nil
 }
@@ -114,9 +110,10 @@ func (m *Product) ValidateProductExists(o orm.Ormer, valid *validation.Validatio
 func UpdateProduct(o orm.Ormer, m *Product) (err error) {
 	m.clearValidationErrors()
 	m.setTimestampsOnUpdate()
-	isValid := m.validateOnUpdate(o)
-	if !isValid {
-		return
+	err = m.validateOnUpdate(o)
+	if err != nil {
+		logs.Error(err)
+		return err
 	}
 	_, err = o.Update(m)
 	if err != nil {
@@ -125,8 +122,8 @@ func UpdateProduct(o orm.Ormer, m *Product) (err error) {
 	return
 }
 
-func (m *Product) Delete(o orm.Ormer) error {
-	err := m.validateProductExists(o)
+func (m *Product) DeleteProduct(o orm.Ormer) error {
+	_, err := FindProductById(o, m.Id)
 	if err != nil {
 		logs.Error(err)
 		return err
