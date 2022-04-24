@@ -5,7 +5,7 @@ import (
 	"api/env"
 	"context"
 	"database/sql"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -59,8 +59,6 @@ func registerDatabase(mysqlDbName string) {
 		constants.DefaultDBAlias,
 		env.GetSQLDriver(),
 		env.GetDbDsn(mysqlDbName),
-		10,
-		10,
 	)
 	if err != nil {
 		logs.Error(err)
