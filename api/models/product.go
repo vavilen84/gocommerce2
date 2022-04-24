@@ -22,13 +22,15 @@ func (m *Product) TableName() string {
 	return constants.ProductDBTable
 }
 
-func (m *Product) validateOnInsert() error {
+func (m *Product) validateOnInsert(o orm.Ormer) bool {
 	valid := validation.Validation{}
 	m.validateCommonFields(&valid)
+	m.ValidateSKUAlreadyUsed(o, &valid)
 	if valid.HasErrors() {
 		m.handleValidationErrors(valid.Errors, constants.ProductModel)
+		return false
 	}
-	return nil
+	return true
 }
 
 func (m *Product) validateCommonFields(valid *validation.Validation) {
@@ -46,14 +48,32 @@ func (m *Product) validateCommonFields(valid *validation.Validation) {
 	valid.Required(m.UpdatedAt, "updated_at")
 }
 
-func (m *Product) validateOnUpdate(o orm.Ormer) error {
+func (m *Product) ValidateSKUAlreadyUsed(o orm.Ormer, valid *validation.Validation) {
+	productFromDb, err := FindProductBySKU(o, m.SKU)
+	if err != nil {
+		if err != orm.ErrNoRows {
+			logs.Error(err)
+		}
+	} else {
+		if (productFromDb.Id != 0) && (m.Id != productFromDb.Id) {
+			err := valid.SetError("sku", "SKU is already in use")
+			if err != nil {
+				logs.Error(err)
+			}
+		}
+	}
+}
+
+func (m *Product) validateOnUpdate(o orm.Ormer) bool {
 	valid := validation.Validation{}
 	m.validateCommonFields(&valid)
 	m.ValidateProductExists(o, &valid)
+	m.ValidateSKUAlreadyUsed(o, &valid)
 	if valid.HasErrors() {
 		m.handleValidationErrors(valid.Errors, constants.ProductModel)
+		return false
 	}
-	return nil
+	return true
 }
 
 func (m *Product) setTimestampsOnCreate() {
@@ -62,20 +82,18 @@ func (m *Product) setTimestampsOnCreate() {
 	m.UpdatedAt = now
 }
 
-func InsertProduct(o orm.Ormer, m *Product) error {
+func InsertProduct(o orm.Ormer, m *Product) (err error) {
 	m.clearValidationErrors()
 	m.setTimestampsOnCreate()
-	err := m.validateOnInsert()
-	if err != nil {
-		logs.Error(err)
-		return err
+	isValid := m.validateOnInsert(o)
+	if !isValid {
+		return
 	}
 	_, err = o.Insert(m)
 	if err != nil {
 		logs.Error(err)
-		return err
 	}
-	return nil
+	return
 }
 
 func FindProductById(o orm.Ormer, id int64) (m Product, err error) {
@@ -110,10 +128,9 @@ func (m *Product) ValidateProductExists(o orm.Ormer, valid *validation.Validatio
 func UpdateProduct(o orm.Ormer, m *Product) (err error) {
 	m.clearValidationErrors()
 	m.setTimestampsOnUpdate()
-	err = m.validateOnUpdate(o)
-	if err != nil {
-		logs.Error(err)
-		return err
+	isValid := m.validateOnUpdate(o)
+	if !isValid {
+		return
 	}
 	_, err = o.Update(m)
 	if err != nil {

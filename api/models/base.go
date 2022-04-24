@@ -3,15 +3,16 @@ package models
 import (
 	"api/constants"
 	"api/helpers"
-	"github.com/beego/beego/v2/core/validation"
 	"github.com/beego/beego/v2/client/orm"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/core/validation"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func init() {
 	orm.RegisterModel(new(User))
 	orm.RegisterModel(new(JWTInfo))
+	orm.RegisterModel(new(Product))
 }
 
 type BaseModel struct {

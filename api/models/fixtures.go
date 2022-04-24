@@ -2,12 +2,13 @@ package models
 
 const (
 	user1key    = "user_1"
-	Product1Sku = "product_1_sku"
+	product1key = "product_1"
+	product1Sku = "product_1_sku"
 )
 
 var (
 	usersFixtures    map[string]User
-	productsFixtures map[int]Product
+	productsFixtures map[string]Product
 )
 
 func initFixtures() {
@@ -20,10 +21,10 @@ func initFixtures() {
 			LastName:  "Dou",
 		},
 	}
-	productsFixtures = map[int]Product{
-		1: {
+	productsFixtures = map[string]Product{
+		product1key: {
 			Title: "Product #1 title",
-			SKU:   Product1Sku,
+			SKU:   product1Sku,
 			Price: 100,
 		},
 	}
