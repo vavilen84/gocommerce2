@@ -139,7 +139,7 @@ func UpdateProduct(o orm.Ormer, m *Product) (err error) {
 	return
 }
 
-func (m *Product) DeleteProduct(o orm.Ormer) error {
+func DeleteProduct(o orm.Ormer, m *Product) error {
 	_, err := FindProductById(o, m.Id)
 	if err != nil {
 		logs.Error(err)

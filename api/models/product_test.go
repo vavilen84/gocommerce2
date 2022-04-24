@@ -46,61 +46,103 @@ func Test_InsertProduct(t *testing.T) {
 	assert.NotEmpty(t, productWithTheSameSKU.ValidationErrors["sku"])
 }
 
-//func TestProduct_FindById(t *testing.T) {
-//	beforeEachTest()
-//	o := orm.NewOrm()
-//	p := createProduct(t, o)
-//
-//	modelFromDb := Product{Id: p.Id}
-//	err := modelFromDb.FindById(o)
-//	assert.Nil(t, err)
-//	assert.Equal(t, p.Title, modelFromDb.Title)
-//	assert.Equal(t, p.SKU, modelFromDb.SKU)
-//	assert.Equal(t, p.Price, modelFromDb.Price)
-//}
-//
-//func TestProduct_FindByDKU(t *testing.T) {
-//	beforeEachTest()
-//	o := orm.NewOrm()
-//	p := createProduct(t, o)
-//
-//	modelFromDb := Product{SKU: p.SKU}
-//	err := modelFromDb.FindBySKU(o)
-//	assert.Nil(t, err)
-//	assert.Equal(t, p.Title, modelFromDb.Title)
-//	assert.Equal(t, p.SKU, modelFromDb.SKU)
-//	assert.Equal(t, p.Price, modelFromDb.Price)
-//}
-//
-//func TestProduct_Update(t *testing.T) {
-//	beforeEachTest()
-//	o := orm.NewOrm()
-//	p := createProduct(t, o)
-//	newTitle := "New Title"
-//	p.Title = newTitle
-//	err := p.Update(o)
-//	assert.Nil(t, err)
-//
-//	modelFromDb := Product{Id: p.Id}
-//	err = modelFromDb.FindById(o)
-//	assert.Nil(t, err)
-//	assert.Equal(t, newTitle, modelFromDb.Title)
-//}
-//
-//func TestProduct_Delete(t *testing.T) {
-//	beforeEachTest()
-//	o := orm.NewOrm()
-//	p := createProduct(t, o)
-//
-//	modelFromDb := Product{Id: p.Id}
-//	err := modelFromDb.FindById(o)
-//	assert.Nil(t, err)
-//
-//	err = modelFromDb.Delete(o)
-//	assert.Nil(t, err)
-//
-//	deletedProduct := Product{Id: p.Id}
-//	err = deletedProduct.FindById(o)
-//	assert.NotNil(t, err)
-//	assert.Equal(t, orm.ErrNoRows, err)
-//}
+func Test_FindProductBySKU(t *testing.T) {
+	beforeEachTest()
+	o := orm.NewOrm()
+
+	p := productsFixtures[product1key]
+
+	// successfully inserted
+	err := InsertProduct(o, &p)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, p.Id)
+	assert.Empty(t, p.ValidationErrors)
+
+	// find inserted product
+	productFromDb, err := FindProductBySKU(o, p.SKU)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, productFromDb.Id)
+	assert.Equal(t, p.Id, productFromDb.Id)
+	assert.Equal(t, p.Title, productFromDb.Title)
+	assert.Equal(t, p.SKU, productFromDb.SKU)
+	assert.NotEmpty(t, productFromDb.CreatedAt)
+	assert.NotEmpty(t, productFromDb.UpdatedAt)
+}
+
+func Test_ProductUpdate(t *testing.T) {
+	beforeEachTest()
+	o := orm.NewOrm()
+
+	p := productsFixtures[product1key]
+
+	// successfully inserted
+	err := InsertProduct(o, &p)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, p.Id)
+	assert.Empty(t, p.ValidationErrors)
+
+	// find inserted product
+	productFromDb, err := FindProductById(o, p.Id)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, productFromDb.Id)
+	assert.Equal(t, p.Id, productFromDb.Id)
+	assert.Equal(t, p.Title, productFromDb.Title)
+	assert.Equal(t, p.SKU, productFromDb.SKU)
+	assert.NotEmpty(t, productFromDb.CreatedAt)
+	assert.NotEmpty(t, productFromDb.UpdatedAt)
+
+	newTitle := "new_title"
+	newSKU := "new_sku"
+	newPrice := 200
+
+	updatedProduct := Product{
+		BaseModel: BaseModel{
+			Id:        productFromDb.Id,
+			CreatedAt: productFromDb.CreatedAt,
+			UpdatedAt: productFromDb.UpdatedAt,
+		},
+		Title: newTitle,
+		SKU:   newSKU,
+		Price: newPrice,
+	}
+	err = UpdateProduct(o, &updatedProduct)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, productFromDb.CreatedAt)
+	assert.NotEmpty(t, productFromDb.UpdatedAt)
+	assert.Equal(t, productFromDb.CreatedAt, updatedProduct.CreatedAt)
+	assert.Equal(t, newTitle, updatedProduct.Title)
+	assert.Equal(t, newSKU, updatedProduct.SKU)
+	assert.Equal(t, newPrice, updatedProduct.Price)
+}
+
+func TestProduct_Delete(t *testing.T) {
+	beforeEachTest()
+	o := orm.NewOrm()
+
+	p := productsFixtures[product1key]
+
+	// successfully inserted
+	err := InsertProduct(o, &p)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, p.Id)
+	assert.Empty(t, p.ValidationErrors)
+
+	// find inserted product
+	productFromDb, err := FindProductBySKU(o, p.SKU)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, productFromDb.Id)
+	assert.Equal(t, p.Id, productFromDb.Id)
+	assert.Equal(t, p.Title, productFromDb.Title)
+	assert.Equal(t, p.SKU, productFromDb.SKU)
+	assert.NotEmpty(t, productFromDb.CreatedAt)
+	assert.NotEmpty(t, productFromDb.UpdatedAt)
+
+	// remove product
+	err = DeleteProduct(o, &productFromDb)
+	assert.Nil(t, err)
+
+	// try to find deleted user
+	productFromDb, err = FindProductBySKU(o, p.SKU)
+	assert.NotNil(t, err)
+	assert.Empty(t, productFromDb.Id)
+}
