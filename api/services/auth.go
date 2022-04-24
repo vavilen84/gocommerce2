@@ -1,15 +1,14 @@
 package services
 
 import (
-	"api/env"
 	"api/helpers"
 	"api/models"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/beego/beego/v2/client/orm"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/gbrlsnchs/jwt/v3"
+	_ "github.com/go-sql-driver/mysql"
 	"regexp"
 	"time"
 )
@@ -25,9 +24,9 @@ type JWTPayload struct {
 }
 
 func (a *JWTAuthService) getExpirationTime() (expirationTime int) {
-	expiresAt := time.Now().Add(time.Duration(env.GetJWTExpireDurationDays()) * 24 * time.Hour)
+	expiresAt := helpers.GetDefaultJWTExpiresAt()
 	if a.ExpirationTime == 0 {
-		expirationTime = int(expiresAt.UTC().Unix())
+		expirationTime = expiresAt
 	} else {
 		expirationTime = a.ExpirationTime
 	}
