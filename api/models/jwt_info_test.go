@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/helpers"
 	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ func Test_InsertJWTInfo(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Empty(t, jwtInfo.Id)
 	assert.NotEmpty(t, jwtInfo.ValidationErrors["user"])
+	assert.NotEmpty(t, jwtInfo.ValidationErrors["expires_at"])
 
 	// create user
 	u := usersFixtures[user1key]
@@ -25,6 +27,7 @@ func Test_InsertJWTInfo(t *testing.T) {
 	assert.Empty(t, u.ValidationErrors)
 
 	jwtInfo.User = &u
+	jwtInfo.ExpiresAt = helpers.GetDefaultJWTExpiresAt()
 	err = InsertJWTInfo(o, &jwtInfo)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, jwtInfo.Id)
