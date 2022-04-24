@@ -59,6 +59,7 @@ const (
 	TaxDBTable                  = "tax"
 	JWTInfoDBTable              = "jwt_info"
 	UserDBTable                 = "user"
+	CategoryDBTable             = "category"
 
 	// migrations
 	MigrationsFolder = "migrations"
@@ -90,6 +91,7 @@ const (
 	ProductModel   = "Product"
 	UserModel      = "User"
 	JWTInfoModel   = "JWTInfo"
+	CategoryModel  = "Category"
 
 	// field names
 

@@ -141,7 +141,7 @@ func TestProduct_Delete(t *testing.T) {
 	err = DeleteProduct(o, &productFromDb)
 	assert.Nil(t, err)
 
-	// try to find deleted user
+	// try to find deleted product
 	productFromDb, err = FindProductBySKU(o, p.SKU)
 	assert.NotNil(t, err)
 	assert.Empty(t, productFromDb.Id)

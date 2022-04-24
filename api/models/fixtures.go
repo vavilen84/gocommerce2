@@ -1,14 +1,16 @@
 package models
 
 const (
-	user1key    = "user_1"
-	product1key = "product_1"
-	product1Sku = "product_1_sku"
+	user1key     = "user_1"
+	product1key  = "product_1"
+	product1Sku  = "product_1_sku"
+	category1key = "category_1"
 )
 
 var (
 	usersFixtures    map[string]User
 	productsFixtures map[string]Product
+	categoryFixtures map[string]Category
 )
 
 func initFixtures() {
@@ -26,6 +28,11 @@ func initFixtures() {
 			Title: "Product #1 title",
 			SKU:   product1Sku,
 			Price: 100,
+		},
+	}
+	categoryFixtures = map[string]Category{
+		category1key: {
+			Title: "Category #1 title",
 		},
 	}
 }
