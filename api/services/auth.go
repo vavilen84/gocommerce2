@@ -6,10 +6,10 @@ import (
 	"api/models"
 	"encoding/base64"
 	"encoding/json"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/gbrlsnchs/jwt/v3"
-	_ "github.com/go-sql-driver/mysql"
 	"regexp"
 	"time"
 )

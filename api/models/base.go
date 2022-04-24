@@ -2,10 +2,11 @@ package models
 
 import (
 	"api/constants"
-	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/validation"
-	"github.com/beego/beego/v2/core/logs"
+	"api/helpers"
+	"github.com/beego/beego/v2/core/validation"
+	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 func init() {
@@ -16,6 +17,8 @@ func init() {
 type BaseModel struct {
 	Id               int64               `json:"id" orm:"auto"`
 	ValidationErrors map[string][]string `orm:"-"`
+	CreatedAt        int                 `json:"created_at" orm:"column(created_at)"`
+	UpdatedAt        int                 `json:"updated_at" orm:"column(updated_at)"`
 }
 
 func (m *BaseModel) clearValidationErrors() {
@@ -48,4 +51,15 @@ func (m *BaseModel) logValidationErrors(errors []*validation.Error, modelName st
 	for _, err := range errors {
 		logs.Error("Validation error; Model: %v; Key: %v; Message: %v", modelName, err.Key, err.Message)
 	}
+}
+
+func (m *BaseModel) setTimestampsOnInsert() {
+	now := helpers.GetNowUTCTimestamp()
+	m.CreatedAt = now
+	m.UpdatedAt = now
+}
+
+func (m *BaseModel) setTimestampsOnUpdate() {
+	now := helpers.GetNowUTCTimestamp()
+	m.UpdatedAt = now
 }

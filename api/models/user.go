@@ -2,11 +2,10 @@ package models
 
 import (
 	"api/constants"
-	"api/helpers"
 	"fmt"
 	"github.com/anaskhan96/go-password-encoder"
-	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/validation"
+	"github.com/beego/beego/v2/core/validation"
+	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -25,8 +24,6 @@ type User struct {
 	Role      int    `json:"role" orm:"column(role)"`
 	FirstName string `json:"first_name" orm:"column(first_name)"`
 	LastName  string `json:"last_name" orm:"column(last_name)"`
-	CreatedAt int    `json:"created_at" orm:"column(created_at)"`
-	UpdatedAt int    `json:"updated_at" orm:"column(updated_at)"`
 }
 
 func FindUserByEmail(o orm.Ormer, email string) (*User, error) {
@@ -103,17 +100,6 @@ func (m *User) setPasswordOnUpdate(o orm.Ormer) {
 		m.Password = oldUser.Password
 		m.Salt = oldUser.Salt
 	}
-}
-
-func (m *User) setTimestampsOnInsert() {
-	now := helpers.GetNowUTCTimestamp()
-	m.CreatedAt = now
-	m.UpdatedAt = now
-}
-
-func (m *User) setTimestampsOnUpdate() {
-	now := helpers.GetNowUTCTimestamp()
-	m.UpdatedAt = now
 }
 
 func (m *User) encodePassword() {
