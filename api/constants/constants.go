@@ -31,6 +31,7 @@ const (
 	MysqlPortEnvVar          = "MYSQL_PORT"
 	MysqlHostEnvVar          = "MYSQL_HOST"
 	DockerMysqlServiceEnvVar = "DOCKER_MYSQL_SERVICE"
+	DockerizedDBEnvVar       = "DOCKERIZED_DB"
 
 	// app env
 	EnvFileVar   = "ENV_FILE"

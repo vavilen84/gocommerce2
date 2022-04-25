@@ -54,6 +54,8 @@ func RunCmd(name string, arg ...string) {
 		arg...,
 	)
 	out, err := cmd.Output()
+	fmt.Println(out)
+	fmt.Println(err)
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok {
 			eStr := suppressErr(string(ee.Stderr))

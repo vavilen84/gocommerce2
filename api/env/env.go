@@ -42,6 +42,30 @@ func GetMySQLUserPass() string {
 	return os.Getenv(constants.MysqlPasswordEnvVar)
 }
 
+func getEnvVarIntValue(v string) int {
+	resultString := os.Getenv(v)
+	resultInt, err := strconv.Atoi(resultString)
+	if err != nil {
+		logs.Error(err)
+	}
+	return resultInt
+}
+
+func getEnvVarBoolValue(v int) bool {
+	if v == 1 {
+		return true
+	}
+	return false
+}
+
+func GetDockerMysqlService() string {
+	return os.Getenv(constants.DockerMysqlServiceEnvVar)
+}
+
+func GetDockerizedDB() bool {
+	return getEnvVarBoolValue(getEnvVarIntValue(constants.DockerizedDBEnvVar))
+}
+
 func GetMySQLTestUserPass() string {
 	return os.Getenv(constants.MysqlTestUserPasswordEnvVar)
 }
@@ -67,10 +91,5 @@ func GetSecret() string {
 }
 
 func GetJWTExpireDurationDays() int {
-	resultString := os.Getenv(constants.JWTExpireDurationDays)
-	resultInt, err := strconv.Atoi(resultString)
-	if err != nil {
-		logs.Error(err)
-	}
-	return resultInt
+	return getEnvVarIntValue(constants.JWTExpireDurationDays)
 }

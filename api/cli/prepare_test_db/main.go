@@ -6,6 +6,7 @@ import (
 	"api/helpers"
 	"api/store"
 	"database/sql"
+	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	"github.com/joho/godotenv"
 	"os"
@@ -60,13 +61,28 @@ func clearTestDb() {
 
 func createDbDump() {
 	os.Remove(getDbDumpFile())
-	helpers.RunCmd(
-		"mysqldump",
-		"-u"+env.GetMySQLUser(),
-		"-p"+env.GetMySQLUserPass(),
-		env.GetMySQLTestDb(),
-		"--result-file="+getDbDumpFile(),
-	)
+	dockerizedDb := env.GetDockerizedDB()
+	dbDockerService := env.GetDockerMysqlService()
+	if dockerizedDb {
+		format := "docker exec %s /usr/bin/mysqldump -u %s --password=%s %s > %s"
+		cmd := fmt.Sprintf(
+			format,
+			dbDockerService,
+			env.GetMySQLUser(),
+			env.GetMySQLUserPass(),
+			env.GetMySQLTestDb(),
+			getDbDumpFile(),
+		)
+		helpers.RunCmd("/bin/sh", "-c", cmd)
+	} else {
+		helpers.RunCmd(
+			"mysqldump",
+			"-u"+env.GetMySQLUser(),
+			"-p"+env.GetMySQLUserPass(),
+			env.GetMySQLTestDb(),
+			"--result-file="+getDbDumpFile(),
+		)
+	}
 }
 
 func getDbDumpFile() string {
