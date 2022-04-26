@@ -22,7 +22,7 @@ func (m *AddCategoryTable_20220424_173424) Up() {
 	m.SQL(`
 		CREATE TABLE category
 		(
-			id         INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+			id         INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 			title      varchar(255) NOT NULL,
 			created_at INT(11) NOT NULL,
 			updated_at INT(11) NOT NULL

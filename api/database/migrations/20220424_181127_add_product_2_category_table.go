@@ -25,11 +25,10 @@ func (m *AddProduct2CategoryTable_20220424_181127) Up() {
 		"category_id INT NOT NULL, " +
 		"created_at INT(11)," +
 		"updated_at INT(11)," +
-		"UNIQUE KEY(product_id,category_id)" +
-		//	"FOREIGN KEY (category_id) REFERENCES category(id)" +
+		"UNIQUE KEY product_category_id (product_id,category_id)" +
 		") ENGINE=InnoDB CHARSET=utf8;")
-	//m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id);")
-	//m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES category(id);")
+	m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id);")
+	m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES category(id);")
 }
 
 // Reverse the migrations
