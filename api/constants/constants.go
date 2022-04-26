@@ -48,19 +48,22 @@ const (
 	DefaultDBAlias = "default"
 
 	// db tables
-	MigrationDBTable            = "migration"
-	ProductDBTable              = "product"
-	CustomerDBTable             = "customer"
-	OrderDBTable                = "order"
-	OrderProductDBTable         = "order_product"
+	MigrationDBTable = "migration"
+	ProductDBTable   = "product"
+	CustomerDBTable  = "customer"
+	OrderDBTable     = "order"
+	TaxDBTable       = "tax"
+	JWTInfoDBTable   = "jwt_info"
+	UserDBTable      = "user"
+	CategoryDBTable  = "category"
+
 	OrderTaxDBTable             = "order_tax"
+	OrderProductDBTable         = "order_product"
+	OrderDiscountDBTable        = "order_discount"
 	OrderProductTaxDBTable      = "order_product_tax"
 	OrderProductDiscountDBTable = "order_product_discount"
-	OrderDiscountDBTable        = "order_discount"
-	TaxDBTable                  = "tax"
-	JWTInfoDBTable              = "jwt_info"
-	UserDBTable                 = "user"
-	CategoryDBTable             = "category"
+
+	Product2CategoryDBTable = "product_2_category"
 
 	// migrations
 	MigrationsFolder = "migrations"

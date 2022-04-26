@@ -14,6 +14,7 @@ func init() {
 	orm.RegisterModel(new(JWTInfo))
 	orm.RegisterModel(new(Product))
 	orm.RegisterModel(new(Category))
+	orm.RegisterModel(new(Product2Category))
 }
 
 type BaseModel struct {
