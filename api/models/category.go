@@ -13,6 +13,8 @@ import (
 type Category struct {
 	BaseModel
 	Title string `json:"title" orm:"column(title)"`
+
+	Products []*Product `orm:"rel(m2m);rel_through(api/models.Product2Category)"`
 }
 
 func (m *Category) TableName() string {
@@ -95,10 +97,14 @@ func FindCategoryByTitle(o orm.Ormer, title string) (m Category, err error) {
 }
 
 func FindCategoryById(o orm.Ormer, id int64) (m Category, err error) {
-	err = o.QueryTable(constants.CategoryDBTable).Filter("id", id).One(&m)
+	err = o.QueryTable(constants.CategoryDBTable).
+		Filter("id", id).
+		RelatedSel().
+		One(&m)
 	if err != nil {
 		logs.Error(err)
 	}
+	_, err = o.LoadRelated(&m, "Products")
 	return
 }
 

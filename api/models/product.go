@@ -99,10 +99,14 @@ func InsertProduct(o orm.Ormer, m *Product) (err error) {
 }
 
 func FindProductById(o orm.Ormer, id int64) (m Product, err error) {
-	err = o.QueryTable(constants.ProductDBTable).Filter("id", id).One(&m)
+	err = o.QueryTable(constants.ProductDBTable).
+		Filter("id", id).
+		RelatedSel().
+		One(&m)
 	if err != nil {
 		logs.Error(err)
 	}
+	_, err = o.LoadRelated(&m, "Categories")
 	return
 }
 

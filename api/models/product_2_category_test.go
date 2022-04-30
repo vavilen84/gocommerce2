@@ -66,4 +66,18 @@ func Test_AddCategory2Product(t *testing.T) {
 	m2m := o.QueryM2M(&productFromDb, "Categories")
 	_, err = m2m.Add(&categoryFromDb)
 	assert.Nil(t, err)
+
+	// get related product categories
+	productFromDb, err = FindProductById(o, p.Id)
+	assert.NotEmpty(t, productFromDb.Categories)
+	assert.Equal(t, len(productFromDb.Categories), 1)
+	assert.Equal(t, categoryFromDb.Id, productFromDb.Categories[0].Id)
+	assert.Equal(t, categoryFromDb.Title, productFromDb.Categories[0].Title)
+
+	// get related category products
+	categoryFromDb, err = FindCategoryById(o, m.Id)
+	assert.NotEmpty(t, categoryFromDb.Products)
+	assert.Equal(t, len(categoryFromDb.Products), 1)
+	assert.Equal(t, productFromDb.Id, categoryFromDb.Products[0].Id)
+	assert.Equal(t, productFromDb.Title, categoryFromDb.Products[0].Title)
 }
