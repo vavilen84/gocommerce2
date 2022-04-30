@@ -1,7 +1,6 @@
 package models
 
 import (
-	"api/constants"
 	"api/helpers"
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
@@ -15,6 +14,7 @@ func init() {
 	orm.RegisterModel(new(Product))
 	orm.RegisterModel(new(Category))
 	orm.RegisterModel(new(Product2Category))
+	orm.RegisterModel(new(Discount))
 }
 
 type BaseModel struct {
@@ -30,7 +30,7 @@ func (m *BaseModel) clearValidationErrors() {
 
 func (m *BaseModel) handleValidationErrors(errors []*validation.Error, modelName string) {
 	m.setValidationErrors(errors)
-	m.logValidationErrors(errors, constants.JWTInfoModel)
+	m.logValidationErrors(errors, modelName)
 }
 
 func (m *BaseModel) setValidationErrors(errors []*validation.Error) {
