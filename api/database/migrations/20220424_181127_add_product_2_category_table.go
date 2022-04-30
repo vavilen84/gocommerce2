@@ -27,8 +27,14 @@ func (m *AddProduct2CategoryTable_20220424_181127) Up() {
 		"updated_at INT(11)," +
 		"UNIQUE KEY product_category_id (product_id,category_id)" +
 		") ENGINE=InnoDB CHARSET=utf8;")
-	m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id);")
-	m.SQL("ALTER TABLE product_2_category ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) REFERENCES category(id);")
+
+	m.SQL("ALTER TABLE product_2_category " +
+		"ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) " +
+		"REFERENCES product(id) ON DELETE CASCADE;")
+
+	m.SQL("ALTER TABLE product_2_category " +
+		"ADD CONSTRAINT fk_category_id FOREIGN KEY (category_id) " +
+		"REFERENCES category(id) ON DELETE CASCADE;")
 }
 
 // Reverse the migrations

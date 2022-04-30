@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_AddCategory2Product(t *testing.T) {
+func Test_Category2Product(t *testing.T) {
 	beforeEachTest()
 	o := orm.NewOrm()
 
@@ -80,4 +80,14 @@ func Test_AddCategory2Product(t *testing.T) {
 	assert.Equal(t, len(categoryFromDb.Products), 1)
 	assert.Equal(t, productFromDb.Id, categoryFromDb.Products[0].Id)
 	assert.Equal(t, productFromDb.Title, categoryFromDb.Products[0].Title)
+
+	// delete category with related products
+	// remove category
+	err = DeleteCategory(o, &categoryFromDb)
+	assert.Nil(t, err)
+
+	// try to find deleted category
+	categoryFromDb, err = FindCategoryById(o, m.Id)
+	assert.NotNil(t, err)
+	assert.Empty(t, categoryFromDb.Id)
 }
