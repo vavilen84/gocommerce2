@@ -78,11 +78,7 @@ const (
 	JWTInfoModel   = "JWTInfo"
 	CategoryModel  = "Category"
 	DiscountModel  = "Discount"
-
-	//tax types
-	TaxCartType     = 1
-	TaxCategoryType = 2
-	TaxProductType  = 3
+	TaxModel       = "Tax"
 
 	//discount types
 	DiscountCartType     = 1

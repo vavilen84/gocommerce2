@@ -103,6 +103,7 @@ func FindCategoryById(o orm.Ormer, id int64) (m Category, err error) {
 		One(&m)
 	if err != nil {
 		logs.Error(err)
+		return
 	}
 	_, err = o.LoadRelated(&m, "Products")
 	return

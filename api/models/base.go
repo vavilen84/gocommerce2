@@ -15,6 +15,7 @@ func init() {
 	orm.RegisterModel(new(Category))
 	orm.RegisterModel(new(Product2Category))
 	orm.RegisterModel(new(Discount))
+	orm.RegisterModel(new(Tax))
 }
 
 type BaseModel struct {

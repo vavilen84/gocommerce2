@@ -13,6 +13,9 @@ const (
 	discount1key = "discount_1"
 	discount2key = "discount_2"
 	discount3key = "discount_3"
+
+	tax1key = "tax_1"
+	tax2key = "tax_2"
 )
 
 var (
@@ -20,9 +23,21 @@ var (
 	productsFixtures map[string]Product
 	categoryFixtures map[string]Category
 	discountFixtures map[string]Discount
+	taxFixtures      map[string]Tax
 )
 
 func initFixtures() {
+	taxFixtures = map[string]Tax{
+		tax1key: {
+			Title:  "Fixed amount tax",
+			Amount: 1,
+		},
+		tax2key: {
+			Title:      "Percentage tax",
+			Percentage: 10,
+		},
+	}
+
 	discountFixtures = map[string]Discount{
 		discount1key: {
 			Title:  "cart_discount",
